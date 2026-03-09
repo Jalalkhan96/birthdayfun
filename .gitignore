@@ -1,0 +1,44 @@
+# ─── Dependencies ─────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build Output ─────────────────────────
+dist/
+build/
+.next/
+out/
+
+# ─── Environment Variables (NEVER commit these!) ──
+.env
+.env.local
+.env.production
+.env.*.local
+bot/.env
+
+# ─── Python ───────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+*.log
+
+# ─── OS Files ─────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor ───────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ─── Misc ─────────────────────────────────
+*.qr.png
+generated_qr/

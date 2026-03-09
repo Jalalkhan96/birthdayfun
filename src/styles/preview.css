@@ -1,0 +1,199 @@
+/* --- Preview Page Styles --- */
+.preview-page {
+    min-height: 100vh;
+    padding: var(--space-2xl) 0;
+    position: relative;
+    z-index: 1;
+}
+
+.preview-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.preview-header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin-bottom: var(--space-sm);
+}
+
+.preview-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .preview-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Birthday Card Preview */
+.birthday-card-preview {
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.birthday-card-name {
+    font-family: var(--font-script);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    text-align: center;
+    margin-bottom: var(--space-md);
+    position: relative;
+    z-index: 2;
+}
+
+.birthday-card-message {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.8;
+    max-width: 90%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* QR Section */
+.qr-section {
+    text-align: center;
+}
+
+.qr-card {
+    display: inline-block;
+    margin-bottom: var(--space-xl);
+}
+
+.qr-wrapper {
+    padding: var(--space-xl);
+    background: white;
+    border-radius: var(--radius-lg);
+    display: inline-block;
+    position: relative;
+}
+
+.qr-wrapper canvas {
+    display: block;
+}
+
+.qr-heart-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    background: white;
+    padding: 4px;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+.qr-label {
+    margin-top: var(--space-md);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* QR Actions */
+.qr-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-xl);
+}
+
+/* Share Section */
+.share-section {
+    margin-top: var(--space-xl);
+}
+
+.share-section h3 {
+    font-size: 1.125rem;
+    margin-bottom: var(--space-lg);
+}
+
+.share-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    border: none;
+    cursor: pointer;
+    color: white;
+    width: 100%;
+    text-align: left;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.share-btn-telegram {
+    background: linear-gradient(135deg, #0088cc, #00a0e3);
+}
+
+.share-btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+}
+
+.share-btn-copy {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+}
+
+.share-btn-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* Link Preview */
+.link-preview {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-top: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    word-break: break-all;
+}
+
+.link-preview code {
+    color: var(--accent-1);
+    flex: 1;
+}
+
+/* Preview Actions */
+.preview-footer {
+    text-align: center;
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border-glass);
+}
+
+.preview-footer-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}

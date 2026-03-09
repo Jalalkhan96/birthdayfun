@@ -1,0 +1,343 @@
+/* --- Celebration Page Styles --- */
+.celebration-page {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Countdown State */
+.countdown-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-xl);
+    position: relative;
+    z-index: 2;
+}
+
+.countdown-teaser {
+    font-family: var(--font-script);
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+    opacity: 0.8;
+}
+
+.countdown-clock {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.countdown-number {
+    width: clamp(64px, 15vw, 100px);
+    height: clamp(72px, 17vw, 110px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-weight: 800;
+    font-family: var(--font-display);
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-number::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.countdown-label {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+}
+
+.countdown-separator {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--text-muted);
+    align-self: flex-start;
+    margin-top: clamp(16px, 4vw, 28px);
+    animation: pulse-glow 2s ease infinite;
+}
+
+.countdown-for {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+}
+
+.countdown-name {
+    font-family: var(--font-script);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--accent-1);
+    margin-top: var(--space-sm);
+}
+
+/* Celebration State */
+.celebration-container {
+    min-height: 100vh;
+    position: relative;
+    z-index: 2;
+}
+
+/* Fireworks Canvas */
+.fireworks-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Confetti Canvas */
+.confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    pointer-events: none;
+}
+
+/* Birthday Title Animation */
+.birthday-title-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    text-align: center;
+    padding: var(--space-xl);
+    pointer-events: none;
+}
+
+.birthday-title-main {
+    font-size: clamp(2.5rem, 10vw, 6rem);
+    font-weight: 900;
+    font-family: var(--font-display);
+    line-height: 1.1;
+    margin-bottom: var(--space-md);
+    text-shadow: 0 0 40px var(--glow-color), 0 0 80px var(--glow-color);
+}
+
+.birthday-title-name {
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-family: var(--font-script);
+    margin-bottom: var(--space-lg);
+}
+
+.birthday-title-message {
+    font-size: clamp(1rem, 2.5vw, 1.375rem);
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.8;
+}
+
+/* Balloon Animation */
+.balloon {
+    position: fixed;
+    bottom: -100px;
+    font-size: 3rem;
+    z-index: 8;
+    animation: rise 6s ease-in forwards;
+}
+
+/* Slideshow */
+.slideshow-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slideshow-image {
+    max-width: 80%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.slideshow-close {
+    position: fixed;
+    top: var(--space-xl);
+    right: var(--space-xl);
+    z-index: 25;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Heart Collage */
+.heart-collage-container {
+    width: 100%;
+    max-width: 500px;
+    margin: var(--space-2xl) auto;
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.heart-collage-item {
+    position: absolute;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.4s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.heart-collage-item:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.heart-collage-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Celebration Content */
+.celebration-content {
+    padding: var(--space-3xl) 0;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+}
+
+.celebration-message-card {
+    max-width: 600px;
+    margin: var(--space-2xl) auto;
+    padding: var(--space-2xl);
+    text-align: center;
+}
+
+.celebration-message-card p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+.celebration-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-md);
+    max-width: 800px;
+    margin: var(--space-2xl) auto;
+}
+
+.celebration-photo {
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.celebration-photo:hover {
+    border-color: var(--accent-1);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow);
+}
+
+.celebration-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Music Toggle */
+.music-toggle {
+    position: fixed;
+    bottom: var(--space-xl);
+    right: var(--space-xl);
+    z-index: 30;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(20px);
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+}
+
+.music-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.1);
+}
+
+.music-toggle.playing {
+    animation: pulse-glow 2s ease infinite;
+    border-color: var(--accent-1);
+}
+
+/* Share Footer on Celebration */
+.celebration-share {
+    padding: var(--space-2xl) 0;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+}
+
+.celebration-share h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-lg);
+}
+
+.celebration-share-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}

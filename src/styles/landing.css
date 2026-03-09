@@ -1,0 +1,426 @@
+/* --- Landing Page Styles --- */
+.landing-page {
+    min-height: 100vh;
+    position: relative;
+}
+
+.landing-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-xl);
+    position: relative;
+    z-index: 1;
+}
+
+.landing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 8px 20px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+    backdrop-filter: blur(10px);
+}
+
+.landing-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    animation: pulse-glow 2s ease infinite;
+}
+
+.landing-title {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: var(--space-lg);
+    max-width: 800px;
+}
+
+.landing-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin-bottom: var(--space-2xl);
+    line-height: 1.7;
+}
+
+.landing-cta-group {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Feature Cards */
+.landing-features {
+    padding: var(--space-3xl) 0;
+    position: relative;
+    z-index: 1;
+}
+
+.landing-features-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-xl);
+}
+
+.feature-card {
+    padding: var(--space-xl);
+    text-align: center;
+    transition: transform var(--transition-normal);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+}
+
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-glow);
+}
+
+.feature-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+}
+
+.feature-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Preview Section */
+.landing-preview {
+    padding: var(--space-3xl) 0;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.preview-mockup {
+    max-width: 400px;
+    margin: var(--space-2xl) auto;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border: 1px solid var(--border-glass);
+    aspect-ratio: 9/16;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Floating Elements */
+.floating-heart {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.6;
+    animation: float 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.floating-sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-1);
+    border-radius: 50%;
+    animation: sparkle 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Footer */
+.landing-footer {
+    padding: var(--space-2xl) 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    border-top: 1px solid var(--border-glass);
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Hero Sub-title & Celebrate Button --- */
+.landing-title-sub {
+    font-size: clamp(1.5rem, 4vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-lg);
+    max-width: 700px;
+}
+
+.btn-celebrate {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.btn-celebrate:hover {
+    background: rgba(255, 45, 117, 0.15) !important;
+    border-color: var(--accent-1) !important;
+    box-shadow: 0 0 30px rgba(255, 45, 117, 0.2);
+}
+
+/* --- AI Tools Section --- */
+.landing-ai-tools {
+    padding: var(--space-3xl) 0;
+    position: relative;
+    z-index: 1;
+}
+
+.ai-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-xl);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* AI Tool Card */
+.ai-tool-card {
+    padding: var(--space-xl);
+}
+
+.ai-tool-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.ai-tool-icon {
+    font-size: 2rem;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-glow);
+}
+
+.ai-tool-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.ai-tool-subtitle {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.ai-tool-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.ai-tool-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.ai-tool-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ai-tool-apikey {
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--border-glass);
+}
+
+.ai-tool-apikey label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+/* Tone Selector */
+.tone-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tone-btn {
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-glass);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tone-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tone-btn.active {
+    border-color: var(--accent-1);
+    background: rgba(255, 45, 117, 0.15);
+    color: var(--text-primary);
+}
+
+/* Gift Results */
+.ai-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.gift-item {
+    padding: var(--space-md);
+    border-left: 3px solid var(--accent-1);
+}
+
+.gift-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 4px;
+}
+
+.gift-desc {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Card Results */
+.card-result {
+    padding: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.card-result-text {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.card-result-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* AI Error */
+.ai-error {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: rgba(255, 45, 45, 0.1);
+    border: 1px solid rgba(255, 45, 45, 0.2);
+    color: #ff6b6b;
+    font-size: 0.8125rem;
+    margin-top: var(--space-md);
+}
+
+/* Birthday Fact Card */
+.birthday-fact-card {
+    padding: var(--space-lg) var(--space-xl);
+    text-align: center;
+    position: relative;
+}
+
+.fact-icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-xs);
+}
+
+.fact-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-1);
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.fact-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    transition: all 0.3s ease;
+}
+
+.fact-next {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.fact-next:hover {
+    background: rgba(255, 45, 117, 0.15);
+    border-color: var(--accent-1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ai-tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-tool-row {
+        grid-template-columns: 1fr;
+    }
+}
