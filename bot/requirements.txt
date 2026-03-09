@@ -2,3 +2,5 @@ python-telegram-bot>=21.0
 qrcode[pil]>=7.4
 python-dotenv>=1.0
 Pillow>=10.0
+google-generativeai>=0.8.0
+

@@ -18,6 +18,7 @@ import base64
 import logging
 from io import BytesIO
 
+import google.generativeai as genai
 from dotenv import load_dotenv
 from telegram import (
     Update,
@@ -42,6 +43,11 @@ TOKEN = os.getenv("BOT_TOKEN", "")
 WEBSITE_URL = os.getenv("WEBSITE_URL", "http://localhost:3000")
 BASE_URL = os.getenv("BASE_URL", "")
 PROXY_URL = os.getenv("PROXY_URL", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+# Configure Gemini if key is available
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 # ─── Clear broken system proxy so httpx doesn't use it ───
 if not PROXY_URL:
@@ -118,8 +124,11 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🌐 Open Birthday Generator",
             web_app=WebAppInfo(url=WEBSITE_URL),
         )],
+        [InlineKeyboardButton("✨ AI Wish", callback_data="ai_wish"),
+         InlineKeyboardButton("🎵 AI Song", callback_data="ai_song")],
+        [InlineKeyboardButton("🎁 Gift Ideas", callback_data="ai_gift"),
+         InlineKeyboardButton("📱 QR Code", callback_data="start_qr")],
         [InlineKeyboardButton("❓ Help & Commands", callback_data="show_help")],
-        [InlineKeyboardButton("📱 Generate QR Code", callback_data="start_qr")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -137,9 +146,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 HELP_TEXT = (
     "📋 *Birthday Generator Bot — Commands*\n\n"
     "🎂 /create — Create a birthday surprise page\n"
-    "📱 /qr `<link>` — Generate a QR code for any link\n"
+    "📱 /qr `<link>` — Generate a QR code\n"
+    "✨ /wish `<name>` — AI birthday wish\n"
+    "🎵 /song `<name>` — AI birthday song\n"
+    "🎁 /gift `<who>` — AI gift ideas\n"
     "❓ /help — Show this help message\n\n"
-    "🌐 *Mini App:* Use the button from /start to open the web generator inside Telegram!\n\n"
+    "🌐 *Mini App:* Use the button from /start!\n\n"
     "🔗 *Deep Link:*\n"
     "`https://t.me/BirthdayCreatorBot?start=create`"
 )
@@ -187,6 +199,111 @@ async def qr_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"QR generation error: {e}")
         await update.message.reply_text("❌ Failed to generate QR code. Please try again.")
+
+
+# ═══════════════════════════════════════════════════════
+# GEMINI AI COMMANDS
+# ═══════════════════════════════════════════════════════
+
+
+def _get_gemini_model():
+    """Get configured Gemini model or None."""
+    if not GEMINI_API_KEY:
+        return None
+    return genai.GenerativeModel("gemini-2.0-flash")
+
+
+async def wish_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generate an AI birthday wish."""
+    if not GEMINI_API_KEY:
+        await update.message.reply_text(
+            "❌ Gemini API key not configured.\n\n"
+            "Ask the admin to add `GEMINI_API_KEY` to the bot's environment variables."
+        )
+        return
+
+    name = " ".join(context.args) if context.args else "my friend"
+    await update.message.reply_text("✨ *Generating a birthday wish...*", parse_mode="Markdown")
+
+    try:
+        model = _get_gemini_model()
+        prompt = (
+            f"Write a warm, heartfelt, and personalized birthday wish for someone named {name}. "
+            "Make it emotional, celebratory, and end with a blessing. "
+            "Use 2-3 relevant emojis. Keep it under 100 words."
+        )
+        response = model.generate_content(prompt)
+        wish_text = response.text.strip()
+
+        await update.message.reply_text(
+            f"🎂 *Birthday Wish for {name}:*\n\n{wish_text}",
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        logger.error(f"Gemini wish error: {e}")
+        await update.message.reply_text("❌ Failed to generate wish. Please try again.")
+
+
+async def song_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generate an AI birthday song."""
+    if not GEMINI_API_KEY:
+        await update.message.reply_text(
+            "❌ Gemini API key not configured.\n\n"
+            "Ask the admin to add `GEMINI_API_KEY` to the bot's environment variables."
+        )
+        return
+
+    name = " ".join(context.args) if context.args else "my friend"
+    await update.message.reply_text("🎵 *Composing a birthday song...*", parse_mode="Markdown")
+
+    try:
+        model = _get_gemini_model()
+        prompt = (
+            f"Write a short, fun birthday song for {name}. "
+            "Structure: Intro → Verse → Chorus. Must be singable in 30 seconds. "
+            "Include their name in the chorus. Use 🎵 at start and end. Keep it joyful."
+        )
+        response = model.generate_content(prompt)
+        song_text = response.text.strip()
+
+        await update.message.reply_text(
+            f"🎵 *Birthday Song for {name}:*\n\n{song_text}",
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        logger.error(f"Gemini song error: {e}")
+        await update.message.reply_text("❌ Failed to generate song. Please try again.")
+
+
+async def gift_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generate AI gift ideas."""
+    if not GEMINI_API_KEY:
+        await update.message.reply_text(
+            "❌ Gemini API key not configured.\n\n"
+            "Ask the admin to add `GEMINI_API_KEY` to the bot's environment variables."
+        )
+        return
+
+    details = " ".join(context.args) if context.args else "a friend"
+    await update.message.reply_text("🎁 *Finding gift ideas...*", parse_mode="Markdown")
+
+    try:
+        model = _get_gemini_model()
+        prompt = (
+            f"Suggest 5 unique and thoughtful birthday gift ideas for {details}. "
+            "Include a budget range for each. Format as a numbered list with emojis. "
+            "Keep each item to 1-2 sentences."
+        )
+        response = model.generate_content(prompt)
+        gift_text = response.text.strip()
+
+        await update.message.reply_text(
+            f"🎁 *Gift Ideas for {details}:*\n\n{gift_text}",
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        logger.error(f"Gemini gift error: {e}")
+        await update.message.reply_text("❌ Failed to generate gift ideas. Please try again.")
 
 
 # ═══════════════════════════════════════════════════════
@@ -627,9 +744,36 @@ def main():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("qr", qr_command))
+    app.add_handler(CommandHandler("wish", wish_command))
+    app.add_handler(CommandHandler("song", song_command))
+    app.add_handler(CommandHandler("gift", gift_command))
     app.add_handler(create_handler)
     app.add_handler(CallbackQueryHandler(show_help_callback, pattern="^show_help$"))
     app.add_handler(CallbackQueryHandler(start_qr_callback, pattern="^start_qr$"))
+    app.add_handler(CallbackQueryHandler(
+        lambda u, c: (u.callback_query.answer() or True) and \
+            u.callback_query.message.reply_text(
+                "✨ Use: `/wish <name>` to generate a wish!\nExample: `/wish Sarah`",
+                parse_mode="Markdown"
+            ),
+        pattern="^ai_wish$"
+    ))
+    app.add_handler(CallbackQueryHandler(
+        lambda u, c: (u.callback_query.answer() or True) and \
+            u.callback_query.message.reply_text(
+                "🎵 Use: `/song <name>` to generate a song!\nExample: `/song Sarah`",
+                parse_mode="Markdown"
+            ),
+        pattern="^ai_song$"
+    ))
+    app.add_handler(CallbackQueryHandler(
+        lambda u, c: (u.callback_query.answer() or True) and \
+            u.callback_query.message.reply_text(
+                "🎁 Use: `/gift <who>` to get gift ideas!\nExample: `/gift my sister who likes art`",
+                parse_mode="Markdown"
+            ),
+        pattern="^ai_gift$"
+    ))
 
     print("✅ Bot is running! Press Ctrl+C to stop.")
     app.run_polling(drop_pending_updates=True)
