@@ -3,10 +3,13 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { getBirthday } from '../utils/storage.js';
 import { applyTheme, getTheme } from '../utils/themes.js';
 
-let scene, camera, renderer, controls;
+let scene, camera, renderer, controls, composer;
 let planets = [];
 let stars;
 let constellationLines;
@@ -130,16 +133,30 @@ function initScene(canvas, data, themeData) {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxDistance = 250;
+    controls.maxDistance = 600;
     controls.minDistance = 5;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.4;
+    controls.autoRotateSpeed = 0.2; // Slower, more cinematic rotation
 
-    // Lighting (BRIGHTER)
-    const ambient = new THREE.AmbientLight(0xffffff, 1.5);
+    // Post-Processing (Bloom)
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        1.5, 0.4, 0.85
+    );
+    bloomPass.threshold = 0.2;
+    bloomPass.strength = 1.2;
+    bloomPass.radius = 0.5;
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    // Lighting (CINEMATIC)
+    const ambient = new THREE.AmbientLight(0x222244, 1.0); // Deeper ambient light
     scene.add(ambient);
-    const point = new THREE.PointLight(0xffffff, 3, 500);
-    point.position.set(0, 50, 0);
+    const point = new THREE.PointLight(0xffffff, 4, 800);
+    point.position.set(0, 0, 0); // Light emanates from center
     scene.add(point);
 
     // Add directional light for better 3D depth
@@ -210,6 +227,7 @@ function initScene(canvas, data, themeData) {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
     cleanupFns.push(() => window.removeEventListener('resize', onResize));
@@ -271,7 +289,7 @@ function initScene(canvas, data, themeData) {
         }
 
         controls.update();
-        renderer.render(scene, camera);
+        composer.render();
     }
     animate();
 }
@@ -413,24 +431,32 @@ function createPlanets(data) {
     const count = photos.length;
     planets = [];
 
-    // Arrange in spiral
+    // Arrange in spiral (3 arms)
     photos.forEach((photoUrl, i) => {
-        const angle = (i / count) * Math.PI * 2 * 1.5;
-        const radius = 20 + (i / count) * 40;
+        const arms = 3;
+        const armIndex = i % arms;
+        const armOffset = (Math.PI * 2 / arms) * armIndex;
+        // The further out the planet, the more it wraps around
+        const radius = 25 + (i / count) * 70;
+        const angle = armOffset + (radius * 0.12) + (Math.random() - 0.5) * 0.4;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
-        const y = (Math.random() - 0.5) * 20;
-        const planetSize = 3 + Math.random() * 2;
+        const y = (Math.random() - 0.5) * 15;
+        const planetSize = 3 + Math.random() * 2.5;
 
-        // Planet sphere - reduced segments for performance (12x12 instead of 32x32)
-        const geometry = new THREE.SphereGeometry(planetSize, 12, 12);
+        // Cinematic High-Gloss Sphere
+        const geometry = new THREE.SphereGeometry(planetSize, 32, 32);
 
         // Load photo as texture
         const loader = new THREE.TextureLoader();
-        const material = new THREE.MeshStandardMaterial({
+        const material = new THREE.MeshPhysicalMaterial({
             color: 0xffffff,
-            roughness: 0.5,
+            roughness: 0.15,
             metalness: 0.1,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+            emissive: 0x111122,
+            emissiveIntensity: 0.2
         });
 
         loader.load(photoUrl, (texture) => {
@@ -895,19 +921,26 @@ function showPopupMessage(text) {
 
 function warpEntrance() {
     if (!camera) return;
-    const startZ = 200;
-    camera.position.set(0, 30, startZ);
 
-    const duration = 2500;
+    // Zoom in from far away for cinematic entry
+    const startZ = 400;
+    const endZ = 120;
+    camera.position.set(0, 80, startZ);
+
+    const duration = 3000;
     const startTime = Date.now();
 
     function animate() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+        const eased = 1 - Math.pow(1 - progress, 4); // Quartic ease-out
 
-        camera.position.z = startZ - (startZ - 80) * eased;
-        camera.position.y = 30 - 10 * eased;
+        camera.position.z = startZ - (startZ - endZ) * eased;
+        camera.position.y = 80 - 40 * eased;
+
+        // FOV stretch effect
+        camera.fov = 110 - 50 * eased;
+        camera.updateProjectionMatrix();
 
         if (progress < 1) {
             requestAnimationFrame(animate);

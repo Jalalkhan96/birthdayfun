@@ -57,9 +57,21 @@ export class InteractiveFireworks {
     startAutoMode(interval = 2000) {
         this.autoMode = true;
         this.autoInterval = setInterval(() => {
-            const x = this.canvas.width * 0.1 + Math.random() * (this.canvas.width * 0.8);
-            const targetY = this.canvas.height * (0.15 + Math.random() * 0.35);
-            this.launchRocket(x, targetY);
+            const edge = Math.random();
+            let startX, startY;
+            if (edge < 0.4) {
+                startX = this.canvas.width * 0.1 + Math.random() * (this.canvas.width * 0.8);
+                startY = this.canvas.height;
+            } else if (edge < 0.7) {
+                startX = 0;
+                startY = this.canvas.height * 0.2 + Math.random() * (this.canvas.height * 0.6);
+            } else {
+                startX = this.canvas.width;
+                startY = this.canvas.height * 0.2 + Math.random() * (this.canvas.height * 0.6);
+            }
+            const targetX = this.canvas.width * 0.2 + Math.random() * (this.canvas.width * 0.6);
+            const targetY = this.canvas.height * 0.15 + Math.random() * 0.35;
+            this.launchRocket(targetX, targetY, startX, startY);
         }, interval);
     }
 
@@ -97,12 +109,22 @@ export class InteractiveFireworks {
         }
     }
 
-    launchRocket(x, targetY) {
+    launchRocket(x, targetY, startX = null, startY = null) {
         const styleConfig = this.STYLES[this.style] || this.STYLES.classic;
+        const sx = startX !== null ? startX : x;
+        const sy = startY !== null ? startY : this.canvas.height;
+        
+        const dx = x - sx;
+        const dy = targetY - sy;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        const speed = 4 + Math.random() * 3;
+        
         this.rockets.push({
-            x, y: this.canvas.height,
-            targetY,
-            speed: 4 + Math.random() * 3,
+            x: sx, y: sy,
+            targetX: x, targetY: targetY,
+            vx: (dx / dist) * speed,
+            vy: (dy / dist) * speed,
+            speed: speed,
             trail: [],
             color: styleConfig.colors[Math.floor(Math.random() * styleConfig.colors.length)],
             style: this.style,
@@ -175,7 +197,8 @@ export class InteractiveFireworks {
             const r = this.rockets[i];
             r.trail.push({ x: r.x, y: r.y });
             if (r.trail.length > 15) r.trail.shift();
-            r.y -= r.speed;
+            r.x += r.vx;
+            r.y += r.vy;
 
             // Draw trail
             for (let j = 0; j < r.trail.length; j++) {
@@ -194,7 +217,8 @@ export class InteractiveFireworks {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fill();
 
-            if (r.y <= r.targetY) {
+            const distToTarget = Math.sqrt(Math.pow(r.x - r.targetX, 2) + Math.pow(r.y - r.targetY, 2));
+            if (distToTarget < r.speed || (r.vy < 0 && r.y <= r.targetY) || (r.vy > 0 && r.y >= r.targetY)) {
                 this.explode(r);
                 this.rockets.splice(i, 1);
             }
