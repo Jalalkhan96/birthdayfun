@@ -33,8 +33,9 @@ export class InteractiveFireworks {
     start() {
         this.resize();
         window.addEventListener('resize', this.resizeHandler);
-        this.canvas.addEventListener('click', this.clickHandler);
-        this.canvas.addEventListener('touchstart', this.touchHandler, { passive: true });
+        // Listen on document so pointer-events:none canvas still fires
+        document.addEventListener('click', this.clickHandler);
+        document.addEventListener('touchstart', this.touchHandler, { passive: true });
         document.addEventListener('keydown', this.keyHandler);
         this.running = true;
         this.animate();
@@ -44,8 +45,8 @@ export class InteractiveFireworks {
         this.running = false;
         this.stopAutoMode();
         window.removeEventListener('resize', this.resizeHandler);
-        this.canvas.removeEventListener('click', this.clickHandler);
-        this.canvas.removeEventListener('touchstart', this.touchHandler);
+        document.removeEventListener('click', this.clickHandler);
+        document.removeEventListener('touchstart', this.touchHandler);
         document.removeEventListener('keydown', this.keyHandler);
     }
 
@@ -69,6 +70,8 @@ export class InteractiveFireworks {
     }
 
     handleClick(e) {
+        // Ignore clicks on buttons and interactive elements
+        if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const targetY = e.clientY - rect.top;
@@ -76,6 +79,8 @@ export class InteractiveFireworks {
     }
 
     handleTouch(e) {
+        // Ignore taps on interactive elements
+        if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT')) return;
         const touch = e.touches[0];
         const rect = this.canvas.getBoundingClientRect();
         const x = touch.clientX - rect.left;

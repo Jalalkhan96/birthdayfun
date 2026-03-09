@@ -94,7 +94,7 @@ function showCelebration(container, data, themeData) {
   container.innerHTML = `
     <div class="celebration-page">
       <canvas class="fireworks-canvas" id="fireworks-canvas" 
-        style="position:fixed;inset:0;z-index:2;pointer-events:auto;"></canvas>
+        style="position:fixed;inset:0;z-index:2;pointer-events:none;touch-action:none;"></canvas>
       <canvas class="confetti-canvas" id="confetti-canvas"></canvas>
       <div class="bg-particles" id="celebration-particles"></div>
 

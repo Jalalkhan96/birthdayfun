@@ -16,6 +16,7 @@ import os
 import json
 import base64
 import logging
+import traceback
 from io import BytesIO
 
 import google.generativeai as genai
@@ -577,15 +578,18 @@ async def receive_timer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         # Share buttons
-        share_text = f"🎂 A birthday surprise for {name} is waiting!\n\n{url}"
+        share_text = f"🎂 A birthday surprise for {name} is waiting!"
+        import urllib.parse
+        encoded_text = urllib.parse.quote(f"{share_text}\n\n{url}")
+        encoded_url = urllib.parse.quote(url)
         keyboard = [
             [InlineKeyboardButton(
                 "📤 Share on Telegram",
-                url=f"https://t.me/share/url?url={url}&text={share_text}",
+                url=f"https://t.me/share/url?url={encoded_url}&text={urllib.parse.quote(share_text)}",
             )],
             [InlineKeyboardButton(
                 "📤 Share on WhatsApp",
-                url=f"https://wa.me/?text={share_text}",
+                url=f"https://wa.me/?text={encoded_text}",
             )],
             [InlineKeyboardButton("🎂 Create Another", callback_data="start_create")],
         ]
@@ -596,9 +600,10 @@ async def receive_timer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
-        logger.error(f"Birthday generation error: {e}")
+        tb = traceback.format_exc()
+        logger.error(f"Birthday generation error: {e}\n{tb}")
         await query.message.reply_text(
-            "❌ Something went wrong. Please try again with /create"
+            f"❌ Something went wrong: {str(e)[:200]}\n\nPlease try again with /create"
         )
 
     return ConversationHandler.END
