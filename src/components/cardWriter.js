@@ -105,7 +105,7 @@ Requirements:
 Write ONLY the card message, nothing else. No quotes around it. Start with "Dear ${name}," and end with a warm closing.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
         contents: prompt,
       });
 

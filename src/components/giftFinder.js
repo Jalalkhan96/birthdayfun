@@ -80,7 +80,7 @@ Description here.
 Make gifts creative, specific, and memorable — not generic. Range from affordable to premium.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
         contents: prompt,
       });
 

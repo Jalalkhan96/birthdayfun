@@ -211,7 +211,7 @@ def _get_gemini_model():
     """Get configured Gemini model or None."""
     if not GEMINI_API_KEY:
         return None
-    return genai.GenerativeModel("gemini-2.0-flash")
+    return genai.GenerativeModel("gemini-1.5-flash")
 
 
 async def wish_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
