@@ -112,7 +112,8 @@ export function renderGalaxy(container, id) {
 function initScene(canvas, data, themeData) {
     // Scene
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050510, 0.002);
+    // Use darker fog for deep space feel
+    scene.fog = new THREE.FogExp2(0x020205, 0.0015);
 
     // Camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
@@ -146,8 +147,11 @@ function initScene(canvas, data, themeData) {
     dirLight.position.set(100, 100, 50);
     scene.add(dirLight);
 
-    // Stars
+    // HD Realistic Stars
     createStarfield();
+
+    // Black Hole Effect
+    createBlackHole();
 
     // Nebula
     createNebula(themeData);
@@ -256,8 +260,14 @@ function initScene(canvas, data, themeData) {
 
         // Animate stars
         if (stars) {
-            stars.rotation.y += 0.0001;
-            stars.rotation.x += 0.00005;
+            stars.rotation.y += 0.00005;
+            stars.rotation.x += 0.00002;
+        }
+
+        // Animate black hole accretion disk
+        const accretionDisk = scene.children.find(c => c.name === 'accretionDisk');
+        if (accretionDisk) {
+            accretionDisk.rotation.z -= 0.002;
         }
 
         controls.update();
@@ -267,14 +277,16 @@ function initScene(canvas, data, themeData) {
 }
 
 function createStarfield() {
-    const count = 1500;
+    const count = 4000; // More stars for HD feel
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
         const i3 = i * 3;
-        const r = 300 + Math.random() * 700;
+        // Spherical distribution
+        const r = 200 + Math.random() * 800;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(2 * Math.random() - 1);
 
@@ -282,25 +294,82 @@ function createStarfield() {
         positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
         positions[i3 + 2] = r * Math.cos(phi);
 
-        const brightness = 0.5 + Math.random() * 0.5;
-        colors[i3] = brightness;
-        colors[i3 + 1] = brightness;
-        colors[i3 + 2] = 0.8 + Math.random() * 0.2;
+        // Realistic star colors (white to slight blue/yellow tinge)
+        const type = Math.random();
+        let color = new THREE.Color(0xffffff);
+        if (type > 0.9) color.setHex(0xaabbff); // Blue giant
+        else if (type > 0.7) color.setHex(0xffddaa); // Yellow dwarf
+        else if (type > 0.95) color.setHex(0xffaaaa); // Red giant
+
+        // Varying brightness
+        const brightness = 0.3 + Math.random() * 0.7;
+        colors[i3] = color.r * brightness;
+        colors[i3 + 1] = color.g * brightness;
+        colors[i3 + 2] = color.b * brightness;
+
+        sizes[i] = Math.random() * 1.5; // Variable star sizes
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
+    // Custom shader for circular stars
     const material = new THREE.PointsMaterial({
-        size: 1.5,
+        size: 2.0,
         vertexColors: true,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.9,
         sizeAttenuation: true,
+        blending: THREE.AdditiveBlending
     });
 
     stars = new THREE.Points(geometry, material);
     scene.add(stars);
+}
+
+function createBlackHole() {
+    // Event Horizon (Pitch Black Sphere)
+    const geom = new THREE.SphereGeometry(40, 32, 32);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const blackHole = new THREE.Mesh(geom, mat);
+    blackHole.position.set(-150, 50, -300);
+    scene.add(blackHole);
+
+    // Accretion Disk (Glowing Ring)
+    const diskGeom = new THREE.RingGeometry(45, 90, 64);
+
+    // Create gradient texture for disk
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(128, 128, 45, 128, 128, 90);
+    gradient.addColorStop(0, 'rgba(255, 200, 100, 0.9)');
+    gradient.addColorStop(0.3, 'rgba(255, 100, 50, 0.6)');
+    gradient.addColorStop(1, 'rgba(50, 10, 50, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 256, 256);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const diskMat = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+
+    const disk = new THREE.Mesh(diskGeom, diskMat);
+    disk.position.copy(blackHole.position);
+    disk.rotation.x = Math.PI / 2 + 0.3; // Tilted slightly
+    disk.rotation.y = 0.2;
+    disk.name = 'accretionDisk';
+    scene.add(disk);
+
+    // Light emitted from accretion disk
+    const bhLight = new THREE.PointLight(0xffaa55, 2, 400);
+    bhLight.position.copy(blackHole.position);
+    scene.add(bhLight);
 }
 
 function createNebula(themeData) {

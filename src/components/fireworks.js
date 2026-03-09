@@ -57,7 +57,7 @@ export class InteractiveFireworks {
     startAutoMode(interval = 2000) {
         this.autoMode = true;
         this.autoInterval = setInterval(() => {
-            const x = Math.random() * this.canvas.width;
+            const x = this.canvas.width * 0.1 + Math.random() * (this.canvas.width * 0.8);
             const targetY = this.canvas.height * (0.15 + Math.random() * 0.35);
             this.launchRocket(x, targetY);
         }, interval);

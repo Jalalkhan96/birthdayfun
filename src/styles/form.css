@@ -119,6 +119,10 @@
     position: relative;
 }
 
+[data-ui-theme="light"] .photo-upload-area {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
 .photo-upload-area:hover,
 .photo-upload-area.drag-over {
     border-color: var(--accent-1);
