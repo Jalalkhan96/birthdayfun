@@ -93,8 +93,8 @@ export class PartyMode {
       }
       .party-toggle {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        bottom: 20px;
+        left: 20px;
         z-index: 1001;
         padding: 10px 18px;
         border-radius: 50px;

@@ -152,6 +152,38 @@
   --glow-color: rgba(255, 255, 255, 0.2);
 }
 
+/* ─── Light Mode Theme Backgrounds ──────────────── */
+[data-ui-theme="light"][data-theme="friends"] {
+  --gradient-bg: radial-gradient(circle at top right, #e0faff 0%, #f0ebff 50%, #e6fff2 100%);
+  --glow-color: rgba(0, 212, 255, 0.3);
+}
+
+[data-ui-theme="light"][data-theme="royal"] {
+  --gradient-bg: radial-gradient(circle at top right, #fffdf0 0%, #fff8d6 50%, #fff0b3 100%);
+  --glow-color: rgba(255, 215, 0, 0.3);
+}
+
+[data-ui-theme="light"][data-theme="cute"] {
+  --gradient-bg: radial-gradient(circle at top right, #ffe6f0 0%, #ffebf0 50%, #ffe6eb 100%);
+  --glow-color: rgba(255, 143, 171, 0.3);
+}
+
+[data-ui-theme="light"][data-theme="minimal"] {
+  --gradient-bg: radial-gradient(circle at top right, #f5f5f5 0%, #f0f0f0 50%, #e8e8e8 100%);
+  --glow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Text color overrides for custom bold themes in dark mode */
+[data-ui-theme="dark"][data-theme] .countdown-teaser,
+[data-ui-theme="dark"][data-theme] .countdown-for,
+[data-ui-theme="dark"][data-theme] .celebration-share p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-ui-theme="dark"][data-theme] .celebration-share h3 {
+  color: #ffffff !important;
+}
+
 /* --- Reset & Base --- */
 *,
 *::before,
