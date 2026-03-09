@@ -1,26 +1,25 @@
-// AI Birthday Song Generator using Gemini API
-
 import { GoogleGenAI } from '@google/genai';
+import { getGeminiKey } from '../utils/geminiConfig.js';
 
-const GEMINI_KEY_STORAGE = 'gemini_api_key';
+const GEMINI_KEY_STORAGE = 'gemini_api_key_unused'; // No longer used
 
 export function getApiKey() {
-    return localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+  return getGeminiKey();
 }
 
 export function setApiKey(key) {
-    localStorage.setItem(GEMINI_KEY_STORAGE, key);
+  // No-op: key is now managed via environment variable
 }
 
 export async function generateBirthdaySong(data) {
-    const apiKey = getApiKey();
-    if (!apiKey) {
-        throw new Error('Gemini API key not set. Please enter your API key in settings.');
-    }
+  const apiKey = getGeminiKey();
+  if (!apiKey) {
+    throw new Error('AI service is not configured. Please contact the admin.');
+  }
 
-    const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey });
 
-    const prompt = `Write a short, fun, and emotional 30-second birthday song.
+  const prompt = `Write a short, fun, and emotional 30-second birthday song.
 
 Details:
 - Name: ${data.name}
@@ -35,62 +34,47 @@ Song requirements:
 - Make it feel personal and special
 - Structure: Short Intro → Verse → Chorus
 - Style: ${data.personalityStyle === 'romantic' ? 'sweet and romantic' :
-            data.personalityStyle === 'funny' ? 'funny and playful' :
-                data.personalityStyle === 'royal' ? 'grand and majestic' :
-                    'fun, catchy, and celebratory'}
+      data.personalityStyle === 'funny' ? 'funny and playful' :
+        data.personalityStyle === 'royal' ? 'grand and majestic' :
+          'fun, catchy, and celebratory'}
 - Add emoji decorations between sections
 - End with a sweet closing line
 
 Format the output as lyrics only. Use 🎵 at the start and end.`;
 
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
 
-        return response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || 'Could not generate song.';
-    } catch (err) {
-        console.error('Gemini API error:', err);
-        if (err.message?.includes('API_KEY') || err.message?.includes('401')) {
-            throw new Error('Invalid API key. Please check your Gemini API key.');
-        }
-        throw new Error('Failed to generate song. Please try again.');
+    return response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || 'Could not generate song.';
+  } catch (err) {
+    console.error('Gemini API error:', err);
+    if (err.message?.includes('API_KEY') || err.message?.includes('401')) {
+      throw new Error('Invalid API key. Please check your Gemini API key.');
     }
+    throw new Error('Failed to generate song. Please try again.');
+  }
 }
 
 // Render the song generator UI
 export function renderSongSection(container, birthdayData) {
-    const apiKey = getApiKey();
+  const apiKey = getApiKey();
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="glass-card-strong" style="margin-top: var(--space-xl);">
       <h3 style="font-size: 1.25rem; margin-bottom: var(--space-lg);">
         <span class="text-gradient">🎵 AI Birthday Song Generator</span>
       </h3>
 
-      ${!apiKey ? `
-        <div class="form-group">
-          <label class="form-label">Enter your Gemini API Key</label>
-          <div style="display:flex; gap: 8px;">
-            <input class="form-input" type="password" id="gemini-key-input" 
-              placeholder="Your Gemini API key..." style="flex:1;" />
-            <button class="btn btn-secondary" id="save-key-btn" type="button">Save</button>
-          </div>
-          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">
-            Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" 
-            style="color:var(--accent-1);">aistudio.google.com</a>. Stored locally only.
-          </p>
-        </div>
-      ` : `
+      ${!apiKey ? '' : `
         <div style="display:flex; align-items:center; gap: 8px; margin-bottom: var(--space-md);">
-          <span style="color: #00ff88; font-size: 0.875rem;">✓ API Key saved</span>
-          <button class="btn btn-secondary" id="change-key-btn" type="button" 
-            style="padding: 6px 12px; font-size: 0.75rem;">Change</button>
+          <span style="color: #00ff88; font-size: 0.875rem;">✓ AI Ready</span>
         </div>
       `}
 
-      <div id="song-extra-fields" style="display:${apiKey ? 'block' : 'none'};">
+      <div id="song-extra-fields">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-md);">
           <div class="form-group" style="margin:0;">
             <label class="form-label">Age (optional)</label>
@@ -136,99 +120,99 @@ export function renderSongSection(container, birthdayData) {
     </div>
   `;
 
-    let selectedSongStyle = 'fun';
-    let generatedLyrics = '';
+  let selectedSongStyle = 'fun';
+  let generatedLyrics = '';
 
-    // Save API key
-    const saveKeyBtn = document.getElementById('save-key-btn');
-    if (saveKeyBtn) {
-        saveKeyBtn.addEventListener('click', () => {
-            const key = document.getElementById('gemini-key-input').value.trim();
-            if (key) {
-                setApiKey(key);
-                renderSongSection(container, birthdayData);
-            }
-        });
-    }
-
-    // Change key
-    const changeKeyBtn = document.getElementById('change-key-btn');
-    if (changeKeyBtn) {
-        changeKeyBtn.addEventListener('click', () => {
-            localStorage.removeItem(GEMINI_KEY_STORAGE);
-            renderSongSection(container, birthdayData);
-        });
-    }
-
-    // Song style selection
-    container.querySelectorAll('[data-song-style]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            container.querySelectorAll('[data-song-style]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedSongStyle = btn.dataset.songStyle;
-        });
+  // Save API key
+  const saveKeyBtn = document.getElementById('save-key-btn');
+  if (saveKeyBtn) {
+    saveKeyBtn.addEventListener('click', () => {
+      const key = document.getElementById('gemini-key-input').value.trim();
+      if (key) {
+        setApiKey(key);
+        renderSongSection(container, birthdayData);
+      }
     });
+  }
 
-    // Generate song
-    const generateBtn = document.getElementById('generate-song-btn');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', async () => {
-            const loading = document.getElementById('song-loading');
-            const output = document.getElementById('song-output');
-            const error = document.getElementById('song-error');
+  // Change key
+  const changeKeyBtn = document.getElementById('change-key-btn');
+  if (changeKeyBtn) {
+    changeKeyBtn.addEventListener('click', () => {
+      localStorage.removeItem(GEMINI_KEY_STORAGE);
+      renderSongSection(container, birthdayData);
+    });
+  }
 
-            loading.style.display = 'block';
-            output.style.display = 'none';
-            error.style.display = 'none';
-            generateBtn.disabled = true;
+  // Song style selection
+  container.querySelectorAll('[data-song-style]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('[data-song-style]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedSongStyle = btn.dataset.songStyle;
+    });
+  });
 
-            try {
-                generatedLyrics = await generateBirthdaySong({
-                    name: birthdayData.name,
-                    age: document.getElementById('song-age')?.value || '',
-                    relationship: birthdayData.relationship,
-                    personalityStyle: selectedSongStyle,
-                    hobby: document.getElementById('song-hobby')?.value || '',
-                });
+  // Generate song
+  const generateBtn = document.getElementById('generate-song-btn');
+  if (generateBtn) {
+    generateBtn.addEventListener('click', async () => {
+      const loading = document.getElementById('song-loading');
+      const output = document.getElementById('song-output');
+      const error = document.getElementById('song-error');
 
-                document.getElementById('song-lyrics').textContent = generatedLyrics;
-                output.style.display = 'block';
-                loading.style.display = 'none';
-            } catch (err) {
-                error.textContent = err.message;
-                error.style.display = 'block';
-                loading.style.display = 'none';
-            }
-            generateBtn.disabled = false;
+      loading.style.display = 'block';
+      output.style.display = 'none';
+      error.style.display = 'none';
+      generateBtn.disabled = true;
+
+      try {
+        generatedLyrics = await generateBirthdaySong({
+          name: birthdayData.name,
+          age: document.getElementById('song-age')?.value || '',
+          relationship: birthdayData.relationship,
+          personalityStyle: selectedSongStyle,
+          hobby: document.getElementById('song-hobby')?.value || '',
         });
-    }
 
-    // Copy lyrics
-    const copyBtn = document.getElementById('copy-song-btn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(generatedLyrics);
-                copyBtn.textContent = '✓ Copied!';
-                setTimeout(() => { copyBtn.textContent = '📋 Copy Lyrics'; }, 2000);
-            } catch { /* fallback */ }
-        });
-    }
+        document.getElementById('song-lyrics').textContent = generatedLyrics;
+        output.style.display = 'block';
+        loading.style.display = 'none';
+      } catch (err) {
+        error.textContent = err.message;
+        error.style.display = 'block';
+        loading.style.display = 'none';
+      }
+      generateBtn.disabled = false;
+    });
+  }
 
-    // Share on Telegram
-    const shareTgBtn = document.getElementById('share-song-tg-btn');
-    if (shareTgBtn) {
-        shareTgBtn.addEventListener('click', () => {
-            const text = encodeURIComponent(`🎵 Birthday Song for ${birthdayData.name}!\n\n${generatedLyrics}`);
-            window.open(`https://t.me/share/url?url=&text=${text}`, '_blank');
-        });
-    }
+  // Copy lyrics
+  const copyBtn = document.getElementById('copy-song-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(generatedLyrics);
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyBtn.textContent = '📋 Copy Lyrics'; }, 2000);
+      } catch { /* fallback */ }
+    });
+  }
 
-    // Regenerate
-    const regenBtn = document.getElementById('regenerate-song-btn');
-    if (regenBtn) {
-        regenBtn.addEventListener('click', () => {
-            generateBtn?.click();
-        });
-    }
+  // Share on Telegram
+  const shareTgBtn = document.getElementById('share-song-tg-btn');
+  if (shareTgBtn) {
+    shareTgBtn.addEventListener('click', () => {
+      const text = encodeURIComponent(`🎵 Birthday Song for ${birthdayData.name}!\n\n${generatedLyrics}`);
+      window.open(`https://t.me/share/url?url=&text=${text}`, '_blank');
+    });
+  }
+
+  // Regenerate
+  const regenBtn = document.getElementById('regenerate-song-btn');
+  if (regenBtn) {
+    regenBtn.addEventListener('click', () => {
+      generateBtn?.click();
+    });
+  }
 }

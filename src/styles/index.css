@@ -55,7 +55,58 @@
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Select dropdown */
+  --select-bg: #1e1f35;
+  --select-text: #ffffff;
+  --select-border: rgba(255, 255, 255, 0.2);
 }
+
+/* ─── Light Theme ───────────────────────────────── */
+[data-ui-theme="light"] {
+  --bg-primary: #f5f5fa;
+  --bg-secondary: #eeeef8;
+  --bg-card: rgba(0, 0, 0, 0.04);
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --text-primary: #111122;
+  --text-secondary: rgba(0, 0, 0, 0.75);
+  --text-muted: rgba(0, 0, 0, 0.45);
+  --border-glass: rgba(0, 0, 0, 0.12);
+  --gradient-bg: radial-gradient(circle at top right, #ffe0ef 0%, #f5f0ff 40%, #fff0f7 100%);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.18);
+  --select-bg: #ffffff;
+  --select-text: #111122;
+  --select-border: rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Theme Toggle Button ───────────────────────── */
+.theme-toggle-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-card);
+  transform: scale(1.05);
+}
+
+
 
 /* --- Theme: Friends Party --- */
 [data-theme="friends"] {
@@ -267,19 +318,20 @@ h5 {
 .form-input {
   width: 100%;
   padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--select-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--select-border, rgba(255, 255, 255, 0.1));
   border-radius: var(--radius-md);
-  color: var(--text-primary);
+  color: var(--select-text, var(--text-primary));
   font-size: 1rem;
   transition: all var(--transition-normal);
   outline: none;
+  font-family: var(--font-primary);
 }
 
 .form-input:focus {
   border-color: var(--accent-1);
-  box-shadow: 0 0 0 3px rgba(255, 45, 117, 0.1);
-  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(255, 45, 117, 0.15);
+  background: var(--select-bg, rgba(255, 255, 255, 0.08));
 }
 
 .form-input::placeholder {
@@ -293,11 +345,43 @@ textarea.form-input {
 
 select.form-input {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-color: var(--select-bg, #1e1f35);
+  color: var(--select-text, #ffffff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ff2d75' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
   padding-right: 40px;
 }
+
+select.form-input option {
+  background-color: var(--select-bg, #1e1f35);
+  color: var(--select-text, #ffffff);
+  padding: 8px 12px;
+}
+
+[data-ui-theme="light"] select.form-input {
+  background-color: #ffffff;
+  color: #111122;
+}
+
+[data-ui-theme="light"] select.form-input option {
+  background-color: #ffffff;
+  color: #111122;
+}
+
+[data-ui-theme="light"] .form-input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #111122;
+}
+
+[data-ui-theme="light"] .form-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
 
 /* --- Utility Classes --- */
 .container {

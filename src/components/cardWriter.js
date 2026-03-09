@@ -1,17 +1,18 @@
-// Card Writer AI — uses Gemini API to generate birthday card messages
+// Card Writer AI — uses shared Gemini API key, no user input needed
 
 import { GoogleGenAI } from '@google/genai';
+import { getGeminiKey } from '../utils/geminiConfig.js';
 
 const TONES = [
-    { id: 'heartwarming', label: 'Heartwarming', emoji: '💖' },
-    { id: 'funny', label: 'Funny', emoji: '😂' },
-    { id: 'poetic', label: 'Poetic', emoji: '📝' },
-    { id: 'short', label: 'Short & Sweet', emoji: '✨' },
-    { id: 'formal', label: 'Formal', emoji: '🎩' },
+  { id: 'heartwarming', label: 'Heartwarming', emoji: '💖' },
+  { id: 'funny', label: 'Funny', emoji: '😂' },
+  { id: 'poetic', label: 'Poetic', emoji: '📝' },
+  { id: 'short', label: 'Short & Sweet', emoji: '✨' },
+  { id: 'formal', label: 'Formal', emoji: '🎩' },
 ];
 
 export function renderCardWriter(container) {
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="glass-card-strong ai-tool-card" id="card-writer-card">
       <div class="ai-tool-header">
         <span class="ai-tool-icon">✍️</span>
@@ -24,12 +25,12 @@ export function renderCardWriter(container) {
       <div class="ai-tool-form">
         <div class="ai-tool-row">
           <div class="ai-tool-field">
-            <label>Recipient Name</label>
+            <label>RECIPIENT NAME</label>
             <input type="text" id="card-name" class="form-input" placeholder="e.g. Sarah" />
           </div>
           <div class="ai-tool-field">
-            <label>Relationship</label>
-            <select id="card-relationship" class="form-input">
+            <label>RELATIONSHIP</label>
+            <select id="card-relationship" class="form-input styled-select">
               <option value="friend">Friend</option>
               <option value="brother">Brother</option>
               <option value="sister">Sister</option>
@@ -44,7 +45,7 @@ export function renderCardWriter(container) {
         </div>
 
         <div class="ai-tool-field">
-          <label>Tone</label>
+          <label>TONE</label>
           <div class="tone-selector" id="tone-selector">
             ${TONES.map(t => `
               <button type="button" class="tone-btn ${t.id === 'heartwarming' ? 'active' : ''}" data-tone="${t.id}">
@@ -52,12 +53,6 @@ export function renderCardWriter(container) {
               </button>
             `).join('')}
           </div>
-        </div>
-
-        <div class="ai-tool-apikey" id="card-apikey-section">
-          <label>Gemini API Key</label>
-          <input type="password" id="card-apikey" class="form-input" placeholder="Enter your API key"
-            value="${localStorage.getItem('gemini_api_key') || ''}" />
         </div>
 
         <button class="btn btn-primary" id="card-generate" style="width:100%;">
@@ -69,38 +64,34 @@ export function renderCardWriter(container) {
     </div>
   `;
 
-    // Tone selection
-    let selectedTone = 'heartwarming';
-    document.getElementById('tone-selector').addEventListener('click', (e) => {
-        const btn = e.target.closest('.tone-btn');
-        if (!btn) return;
-        document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedTone = btn.dataset.tone;
-    });
+  let selectedTone = 'heartwarming';
+  document.getElementById('tone-selector').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tone-btn');
+    if (!btn) return;
+    document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  });
 
-    // Generate
-    document.getElementById('card-generate').addEventListener('click', async () => {
-        const name = document.getElementById('card-name').value.trim();
-        const relationship = document.getElementById('card-relationship').value;
-        const apiKey = document.getElementById('card-apikey').value.trim();
+  document.getElementById('card-generate').addEventListener('click', async () => {
+    const name = document.getElementById('card-name').value.trim();
+    const relationship = document.getElementById('card-relationship').value;
+    const apiKey = getGeminiKey();
 
-        if (!name) { alert('Please enter a name!'); return; }
-        if (!apiKey) { alert('Please enter your Gemini API key!'); return; }
+    if (!name) { alert('Please enter a name!'); return; }
+    if (!apiKey) { alert('AI service is not configured yet. Please contact the admin.'); return; }
 
-        localStorage.setItem('gemini_api_key', apiKey);
+    const btn = document.getElementById('card-generate');
+    const results = document.getElementById('card-results');
+    btn.disabled = true;
+    btn.textContent = '⏳ Writing...';
+    results.style.display = 'none';
 
-        const btn = document.getElementById('card-generate');
-        const results = document.getElementById('card-results');
-        btn.disabled = true;
-        btn.textContent = '⏳ Writing...';
-        results.style.display = 'none';
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const toneLabel = TONES.find(t => t.id === selectedTone)?.label || 'Heartwarming';
 
-        try {
-            const ai = new GoogleGenAI({ apiKey });
-            const toneLabel = TONES.find(t => t.id === selectedTone)?.label || 'Heartwarming';
-
-            const prompt = `Write a beautiful birthday card message for someone named "${name}" who is my ${relationship}.
+      const prompt = `Write a beautiful birthday card message for someone named "${name}" who is my ${relationship}.
 
 Tone: ${toneLabel}
 
@@ -113,14 +104,14 @@ Requirements:
 
 Write ONLY the card message, nothing else. No quotes around it. Start with "Dear ${name}," and end with a warm closing.`;
 
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash',
-                contents: prompt,
-            });
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: prompt,
+      });
 
-            const text = response.text || '';
+      const text = response.text || '';
 
-            results.innerHTML = `
+      results.innerHTML = `
         <div class="card-result glass-card">
           <div class="card-result-text">${text.replace(/\n/g, '<br>')}</div>
           <div class="card-result-actions">
@@ -132,31 +123,31 @@ Write ONLY the card message, nothing else. No quotes around it. Start with "Dear
           🔄 Write Another Version
         </button>
       `;
-            results.style.display = 'block';
+      results.style.display = 'block';
 
-            document.getElementById('card-copy').addEventListener('click', async () => {
-                try {
-                    await navigator.clipboard.writeText(text);
-                    document.getElementById('card-copy').textContent = '✓ Copied!';
-                    setTimeout(() => document.getElementById('card-copy').textContent = '📋 Copy', 2000);
-                } catch { }
-            });
+      document.getElementById('card-copy').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          document.getElementById('card-copy').textContent = '✓ Copied!';
+          setTimeout(() => document.getElementById('card-copy').textContent = '📋 Copy', 2000);
+        } catch { }
+      });
 
-            document.getElementById('card-share').addEventListener('click', () => {
-                const encoded = encodeURIComponent(text);
-                window.open(`https://t.me/share/url?url=&text=${encoded}`, '_blank');
-            });
+      document.getElementById('card-share').addEventListener('click', () => {
+        const encoded = encodeURIComponent(text);
+        window.open(`https://t.me/share/url?url=&text=${encoded}`, '_blank');
+      });
 
-            document.getElementById('card-regenerate').addEventListener('click', () => {
-                document.getElementById('card-generate').click();
-            });
+      document.getElementById('card-regenerate').addEventListener('click', () => {
+        document.getElementById('card-generate').click();
+      });
 
-        } catch (err) {
-            results.innerHTML = `<div class="ai-error">❌ ${err.message || 'Failed to generate.'}</div>`;
-            results.style.display = 'block';
-        }
+    } catch (err) {
+      results.innerHTML = `<div class="ai-error">❌ ${err.message || 'Failed to generate.'}</div>`;
+      results.style.display = 'block';
+    }
 
-        btn.disabled = false;
-        btn.textContent = '✍️ Write Birthday Card';
-    });
+    btn.disabled = false;
+    btn.textContent = '✍️ Write Birthday Card';
+  });
 }

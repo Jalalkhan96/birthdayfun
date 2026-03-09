@@ -17,6 +17,27 @@ const app = document.getElementById('app');
 let currentCleanup = null;
 let currentPage = null;
 
+// ─── Dark / Light Theme Toggle ────────────────────
+(function initTheme() {
+    const saved = localStorage.getItem('ui-theme') || 'dark';
+    document.documentElement.setAttribute('data-ui-theme', saved);
+
+    const btn = document.createElement('button');
+    btn.className = 'theme-toggle-btn';
+    btn.id = 'theme-toggle';
+    btn.title = 'Toggle dark/light mode';
+    btn.innerHTML = saved === 'light' ? '🌙 Dark' : '☀️ Light';
+    document.body.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-ui-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-ui-theme', next);
+        localStorage.setItem('ui-theme', next);
+        btn.innerHTML = next === 'light' ? '🌙 Dark' : '☀️ Light';
+    });
+})();
+
 function route() {
     // Cleanup previous page
     if (currentCleanup && typeof currentCleanup === 'function') {
