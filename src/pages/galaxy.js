@@ -119,9 +119,9 @@ function initScene(canvas, data, themeData) {
     camera.position.set(0, 30, 80);
 
     // Renderer
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
 
@@ -221,20 +221,23 @@ function initScene(canvas, data, themeData) {
         document.removeEventListener('keyup', onKeyUp);
     });
 
+    // Pre-allocate vectors to avoid garbage collection in animate loop
+    const _dir = new THREE.Vector3();
+    const _right = new THREE.Vector3();
+
     // Animate
     function animate() {
         animationId = requestAnimationFrame(animate);
 
-        // WASD movement
+        // WASD movement - use pre-allocated vectors
         const speed = 0.5;
-        const dir = new THREE.Vector3();
-        camera.getWorldDirection(dir);
-        const right = new THREE.Vector3().crossVectors(dir, camera.up).normalize();
+        camera.getWorldDirection(_dir);
+        _right.crossVectors(_dir, camera.up).normalize();
 
-        if (keys['KeyW']) camera.position.addScaledVector(dir, speed);
-        if (keys['KeyS']) camera.position.addScaledVector(dir, -speed);
-        if (keys['KeyA']) camera.position.addScaledVector(right, -speed);
-        if (keys['KeyD']) camera.position.addScaledVector(right, speed);
+        if (keys['KeyW']) camera.position.addScaledVector(_dir, speed);
+        if (keys['KeyS']) camera.position.addScaledVector(_dir, -speed);
+        if (keys['KeyA']) camera.position.addScaledVector(_right, -speed);
+        if (keys['KeyD']) camera.position.addScaledVector(_right, speed);
         if (keys['KeyQ']) camera.position.y += speed;
         if (keys['KeyE']) camera.position.y -= speed;
 
@@ -264,11 +267,10 @@ function initScene(canvas, data, themeData) {
 }
 
 function createStarfield() {
-    const count = 3000;
+    const count = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
-    const sizes = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
         const i3 = i * 3;
@@ -284,13 +286,10 @@ function createStarfield() {
         colors[i3] = brightness;
         colors[i3 + 1] = brightness;
         colors[i3 + 2] = 0.8 + Math.random() * 0.2;
-
-        sizes[i] = 0.5 + Math.random() * 2;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
     const material = new THREE.PointsMaterial({
         size: 1.5,
@@ -354,8 +353,8 @@ function createPlanets(data) {
         const y = (Math.random() - 0.5) * 20;
         const planetSize = 3 + Math.random() * 2;
 
-        // Planet sphere
-        const geometry = new THREE.SphereGeometry(planetSize, 32, 32);
+        // Planet sphere - reduced segments for performance (12x12 instead of 32x32)
+        const geometry = new THREE.SphereGeometry(planetSize, 12, 12);
 
         // Load photo as texture
         const loader = new THREE.TextureLoader();
@@ -378,8 +377,8 @@ function createPlanets(data) {
         mesh.position.set(x, y, z);
         scene.add(mesh);
 
-        // Glow atmosphere
-        const glowGeom = new THREE.SphereGeometry(planetSize * 1.3, 16, 16);
+        // Glow atmosphere - reduced segments for performance
+        const glowGeom = new THREE.SphereGeometry(planetSize * 1.3, 8, 8);
         const glowMat = new THREE.MeshBasicMaterial({
             color: 0xff2d75,
             transparent: true,
@@ -390,10 +389,10 @@ function createPlanets(data) {
         glow.position.copy(mesh.position);
         scene.add(glow);
 
-        // Ring for some planets
+        // Ring for some planets - reduced segments
         let ring = null;
         if (Math.random() > 0.5) {
-            const ringGeom = new THREE.RingGeometry(planetSize * 1.5, planetSize * 2, 32);
+            const ringGeom = new THREE.RingGeometry(planetSize * 1.5, planetSize * 2, 16);
             const ringMat = new THREE.MeshBasicMaterial({
                 color: 0x7b2ff7,
                 transparent: true,
